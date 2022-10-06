@@ -1,0 +1,21 @@
+doctype
+html
+    block head
+        head 
+            link(href='https://fonts.googleapis.com/css?family=Lato:300,300i,700' rel='stylesheet')
+            link(rel='stylesheet' href='/css/style.css')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            title Natours | #{Tour}
+    body
+    
+        include __header
+
+    block content 
+        h1 This is place holder text
+
+    include __footer
+
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js")
+    script(src="/js/bundle.js")
+    script(src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch")
+    script(src="https://js.stripe.com/v3/")
