@@ -38,16 +38,6 @@ exports.signup = catchAsync( async(req,res,next) =>{
     await new Email(newUser,redirectUrl).sendWelcome()
 
     signTokenSendResponse(newUser,res)
-    // const token =signToken(newUser._id)
-
-
-    // res.status(200).json({
-    //     status: 'success',
-    //     token , 
-    //     data: {
-    //         user : newUser
-    //     },
-    //   });
 
 })
 
@@ -63,16 +53,6 @@ exports.login = catchAsync( async(req,res,next) =>{
         return next(new AppError("Email and Password is not matched!" , 401))
     }
 
-    // const token =signToken(user._id)
-
-
-    // res.status(200).json({
-    //     status: 'success',
-    //     token , 
-    //     data: {
-    //         user : user
-    //     },
-    //   });
       signTokenSendResponse(user,res)
 
 })
@@ -114,16 +94,16 @@ exports.loggedIn = async(req,res,next) =>{
     decoded = await promisify(jwt.verify)(token,process.env.JWT_SECRET)
 
    let user = await User.findById(decoded.id)
-    console.log(user)
+    
    if(!user){
     return next()
    }
 
    res.locals.user = user
-   console.log(res.locals)
+
    next() 
     } catch (error) {
-        console.log(error)
+    
         return next()
     }
   
@@ -164,13 +144,9 @@ exports.forgotPassword = catchAsync( async(req,res,next) =>{
     try {
         
             const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/reset-password/${resetToken}}`
-            // const message = `forgot your password ? submit a patch request with new password and confirm password to ${resetURL} .\n if you didn't forgot your password. Please ignore this email!`
+          
             await new Email(user,resetURL).sendPasswordReset()
-        // await sendEmail({
-        //     email : user.email,
-        //     subject : "Your password reset Token is valid for 10 mins",
-        //     message :message
-        // })
+
         
     } catch (error) {
        user.passwordResetToken  =undefined
@@ -186,7 +162,6 @@ exports.forgotPassword = catchAsync( async(req,res,next) =>{
 })
 exports.resetPassword = catchAsync( async(req,res,next) =>{
     const passwordHash = crypto.createHash("sha256").update(req.params.token).digest("hex")
-
     let user =  await User.findOne({passwordResetToken : passwordHash , passwordResetExpires : {
         $gt : Date.now()
     }})

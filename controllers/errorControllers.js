@@ -38,7 +38,7 @@ const sendErrorDev = (err,req,res)=>{
 
 const sendErrorProd = (err,req,res)=>{
     // Operational Trusted Create by us 
-    console.log("error from production" , err)
+   
     
     if(err.isOperational){
         if(req.originalUrl.startsWith("/api")){
@@ -68,13 +68,7 @@ const sendErrorProd = (err,req,res)=>{
                 message : "Something went wrong!" ,
             })
         }
-        // 2.SEND
-        // Message send to the client that we are not share any higher level error
-        // error comes by third party modules ex. mongoose
-        // res.status(500).json({
-        //     status:"error",
-        //     message : "Something went wrong!"
-        // })
+    
     }
 }
 
@@ -89,7 +83,7 @@ module.exports = (err,req,res,next)=>{
         sendErrorDev(err,req,res)
     }else  if(process.env.NODE_ENV === "production"){
         let error =err
-       console.log("error before send to production-->", error)
+  
         if(err.name === "CastError") error = handleCastErrorDB(error)
         if(err.code === 11000) error = handleDuplicateKeyDB(error)
         if(err.name === "ValidationError") error = handleValidationErrorDB(error)

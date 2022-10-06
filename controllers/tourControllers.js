@@ -133,7 +133,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
 });
 
 exports.getDistances = catchAsync(async (req, res, next) => {
-  console.log("req.params",req.params)
+ 
   let {distance,unit} = req.params
   let [lat,lng] = req.params.latlng.split(",")
 

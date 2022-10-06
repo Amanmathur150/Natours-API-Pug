@@ -25,12 +25,12 @@ const importData = async () => {
       await Tour.create(ToursData);
       await Review.create(ReviewsData);
       await User.create(UsersData,{validateBeforeSave : false});
-      console.log('data saved successfully!');
+    
       process.exit(1)
   } catch (error) {
     console.log(error);
-    throw error;
     process.exit(1)
+    throw error;
   }
 };
 const deleteData = async () => {

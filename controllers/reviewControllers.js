@@ -16,8 +16,6 @@ const { updateOne, createOne, deleteOne, getOne, getAll } = require("./handleFac
 // })
 
 exports.setUserIdAndTourId = (req,res,next) =>{
-    console.log("req.params.tourId",req.params.tourId)
-    console.log("req.user._id",req.user._id)
     if(!req.body.tour) req.body.tour = req.params.tourId
     if(!req.body.user) req.body.user = req.user._id
     next()

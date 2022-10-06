@@ -38,7 +38,6 @@ exports.resizeUserPhoto = async (req, res, next) => {
     next()
 };
 exports.resizeTourImages = async (req, res, next) => {
-    console.log(req.files)
   if (!req.files) return next();
     req.body.images = []
     req.body.imageCover = `tour-${req.params.tourId}-${Date.now()}.jpeg`
