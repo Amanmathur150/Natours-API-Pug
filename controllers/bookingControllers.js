@@ -71,7 +71,7 @@ exports.getPaymentCancel = catchAsync( async (req,res,next) =>{
 // })
 
 const createBookingCheckout= async(session)=>{
-    console.log(session)
+ 
   
     const user = (await User.findOne({email : session.customer_details.email}))._id
     const tour = session.client_reference_id
@@ -100,9 +100,7 @@ exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     // process.env.WEBHOOK_SECRET
     const endpointSecret = process.env.WEBHOOK_SECRET
     const sig = req.headers['stripe-signature'];
-    console.log("req.body of payload" , req.body)
-console.log("******** sig****" , sig)
-console.log("******** endpointSecret****" , endpointSecret)
+   
     let event;
   
     try {
