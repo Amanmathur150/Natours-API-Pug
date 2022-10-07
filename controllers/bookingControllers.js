@@ -19,12 +19,13 @@ exports.getCheckoutSession = catchAsync( async (req,res,next) =>{
     const tour = await Tour.findById(req.params.tourId)
    
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    
     const session = await stripe.checkout.sessions.create({
         payment_method_types : ["card"],
         success_url : `${req.protocol}://${req.get("host")}/my-bookings?alert=Booking`,
         cancel_url : `${req.protocol}://${req.get("host")}/payment/cancel`,
         customer_email : req.user.email , 
-        client_reference_id: tour._id,
+        client_reference_id: tour._id.toString(),
         mode: 'payment',
         line_items : [{
             quantity : 1,
@@ -72,9 +73,9 @@ exports.getPaymentCancel = catchAsync( async (req,res,next) =>{
 const createBookingCheckout= async(session)=>{
     console.log(session)
   
-    const user =   await User.findOne({email : session.customer_email})._id
+    const user =   await User.findOne({email : session.customer_details.email})._id
     const tour = session.client_reference_id
-    const price = session.display_items[0].amount /100
+    const price = session.amount_total /100
     if (user && tour&& price){
         await Booking.create({
             user,tour,price
@@ -98,12 +99,12 @@ exports.getMyBookings = catchAsync(async(req,res,next)=>{
 exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     // process.env.WEBHOOK_SECRET
     const endpointSecret = process.env.WEBHOOK_SECRET
-    const sig = request.headers['stripe-signature'];
+    const sig = req.headers['stripe-signature'];
 
     let event;
   
     try {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+      event = Stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
     } catch (err) {
       response.status(400).send(`Webhook Error: ${err.message}`);
       return;
@@ -123,7 +124,7 @@ exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     }
   
     // Return a 200 response to acknowledge receipt of the event
-    response.status(200).json({received : true});
+    res.status(200).json({received : true});
 })
 
 exports.createBooking = createOne(Booking)
