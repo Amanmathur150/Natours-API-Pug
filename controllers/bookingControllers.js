@@ -104,7 +104,7 @@ exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     let event;
   
     try {
-      event = Stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+      event = Stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
       res.status(400).send(`Webhook Error: ${err.message}`);
       return;
@@ -114,7 +114,7 @@ exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     switch (event.type) {
       case 'checkout.session.completed':
         const session = event.data.object;
-        console.log(session)
+   
         createBookingCheckout(session)
         // Then define and call a function to handle the event checkout.session.completed
         break;
