@@ -100,7 +100,7 @@ exports.webhookCheckout = catchAsync(async(req,res,next)=>{
     // process.env.WEBHOOK_SECRET
     const endpointSecret = process.env.WEBHOOK_SECRET
     const sig = req.headers['stripe-signature'];
-
+console.log("req.body of payload" , req.body)
     let event;
   
     try {
