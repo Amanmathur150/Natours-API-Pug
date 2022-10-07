@@ -4,6 +4,7 @@ var morgan = require('morgan')
 const path = require('path')
 const app = express()
 const cookieParser = require('cookie-parser')
+const compression = require('compression')
 const tourRoute = require("./routes/tourRoutes")
 const AppError = require("./utils/appError")
 const globalErrorHandler = require("./controllers/errorControllers")
@@ -22,6 +23,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 
+app.use(compression())
 
 // Api ROUTES
 app.use("/",viewRoute)
