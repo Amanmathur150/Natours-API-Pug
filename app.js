@@ -10,10 +10,16 @@ const tourRoute = require("./routes/tourRoutes")
 const AppError = require("./utils/appError")
 const globalErrorHandler = require("./controllers/errorControllers")
 const userRoute = require("./routes/userRoutes")
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const reviewRoute = require("./routes/reviewRoutes")
 const viewRoute = require("./routes/viewRoutes")
 const bookingRoute = require("./routes/bookingRoutes")
 const { webhookCheckout } = require("./controllers/bookingControllers")
+
 
 app.enable("trust proxy")
 
@@ -31,11 +37,41 @@ app.options("*",cors())
 
 app.use(express.static(path.join(__dirname , "public")) )
 
+// Set security HTTP headers
+app.use(helmet());
+
+const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, please try again in an hour!'
+  });
+  app.use('/api', limiter);
+
 // MIDDLEWERE 
 app.use(morgan("dev"))
 app.use(express.json())
 app.use(cookieParser())
 
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+    hpp({
+      whitelist: [
+        'duration',
+        'ratingsQuantity',
+        'ratingsAverage',
+        'maxGroupSize',
+        'difficulty',
+        'price'
+      ]
+    })
+  );
 
 app.use(compression())
 

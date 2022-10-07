@@ -73,6 +73,5 @@ if (bookbnt) {
 const alertMessage = document.querySelector("body").dataset.alert
 
 if(alertMessage){
-  console.log("hahaha alter message" , alertMessage)
   showAlert("success",alertMessage,20)
 }
