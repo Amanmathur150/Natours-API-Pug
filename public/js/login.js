@@ -10,7 +10,8 @@ export const login = async (email, password) => {
         password,
       },
     });
-
+    console.log(res)
+    console.log(res.data.status)
     if (res.data.status === 'success') {
       showAlert('success', 'Log in successfully');
       window.setTimeout(() => {
@@ -19,8 +20,10 @@ export const login = async (email, password) => {
       }, 3000);
     }
   } catch (error) {
-    showAlert('error', error.response.data.message);
-  }
+        console.log(error)
+   
+      showAlert('error', error.response.data.message);
+}
 };
 export const logout = async () => {
   try {

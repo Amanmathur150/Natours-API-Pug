@@ -17,6 +17,7 @@
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "html-to-text": "^8.2.1",
@@ -37,6 +38,6 @@
     "parcel-bundler": "^1.12.5"
   },
   "engines": {
-    "node" : ">=10.0.0" 
+    "node": ">=10.0.0"
   }
 }

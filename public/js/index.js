@@ -1,4 +1,5 @@
 import { login, logout } from './login';
+import { showAlert } from './showAlert';
 import { booking } from './stripe';
 import { updateProfile, updateSettings } from './updateSetting';
 
@@ -66,4 +67,11 @@ if (bookbnt) {
   bookbnt.addEventListener('click', (e) => {
     booking(tourId);
   });
+}
+
+
+const alertMessage = document.querySelector("body").dataset.alert
+
+if(alertMessage){
+  showAlert("success",alertMessage,20)
 }

@@ -1,10 +1,19 @@
 const Stripe = require('stripe');
 const Booking = require('../models/bookingModel');
 const Tour = require("../models/tourModel");
+const User = require('../models/userModel');
 
 const catchAsync = require("../utils/catchAsync");
 const { createOne, getOne, getAll, updateOne, deleteOne } = require('./handleFactoy');
 
+
+exports.alertMessage =(req,res,next)=>{
+    if(req.query.alert === "Booking"){
+        res.locals.alert = "Your Booking was successfull! Please check your email for a confirmation. if your booking doesn't show up here imediately, please come back later."
+        return next()
+    }  
+    next()
+}
 
 exports.getCheckoutSession = catchAsync( async (req,res,next) =>{
     const tour = await Tour.findById(req.params.tourId)
@@ -12,7 +21,7 @@ exports.getCheckoutSession = catchAsync( async (req,res,next) =>{
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
     const session = await stripe.checkout.sessions.create({
         payment_method_types : ["card"],
-        success_url : `${req.protocol}://${req.get("host")}/?user=${req.user._id}&tour=${tour._id}&price=${tour.price}`,
+        success_url : `${req.protocol}://${req.get("host")}/my-bookings?alert="Booking"`,
         cancel_url : `${req.protocol}://${req.get("host")}/payment/cancel`,
         customer_email : req.user.email , 
         client_reference_id: tour._id,
@@ -49,16 +58,30 @@ exports.getPaymentCancel = catchAsync( async (req,res,next) =>{
     
 })
 
-exports.getPaymentDone = catchAsync(async(req,res,next)=>{
-    const {user,tour,price} = req.query
+// exports.getPaymentDone = catchAsync(async(req,res,next)=>{
+//     const {user,tour,price} = req.query
+//     if (user && tour&& price){
+//         await Booking.create({
+//             user,tour,price
+//         })
+//         return res.redirect("/payment/success")
+//     }
+//     next()
+// })
+
+const createBookingCheckout= async(session)=>{
+    console.log(session)
+  
+    const user =   await User.findOne({email : session.customer_email})._id
+    const tour = session.client_reference_id
+    const price = session.display_items[0].amount /100
     if (user && tour&& price){
         await Booking.create({
             user,tour,price
         })
-        return res.redirect("/payment/success")
+      
     }
-    next()
-})
+}
 exports.getMyBookings = catchAsync(async(req,res,next)=>{
     const myBookings = await Booking.find({user:req.user._id})
     const tourIds = myBookings.map(el => el.tour._id.toString())
@@ -70,6 +93,37 @@ exports.getMyBookings = catchAsync(async(req,res,next)=>{
         title:"My Bookings",
         tours
     })
+})
+
+exports.webhookCheckout = catchAsync(async(req,res,next)=>{
+    // process.env.WEBHOOK_SECRET
+    const endpointSecret = process.env.WEBHOOK_SECRET
+    const sig = request.headers['stripe-signature'];
+
+    let event;
+  
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+  
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object;
+        console.log(session)
+        createBookingCheckout(session)
+        // Then define and call a function to handle the event checkout.session.completed
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+  
+    // Return a 200 response to acknowledge receipt of the event
+    response.status(200).json({received : true});
 })
 
 exports.createBooking = createOne(Booking)

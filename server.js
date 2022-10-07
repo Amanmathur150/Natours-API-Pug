@@ -21,7 +21,7 @@ mongoose.connect(connectionString,{
 
 const port = process.env.PORT || 8000;
 
-app.listen(port, () => {
+const server =  app.listen(port, () => {
   console.log(`port is running on ${port}`);
 });
 
@@ -34,4 +34,10 @@ process.on("unhandledRejection",(err)=>{
 process.on("uncaughtException",(err)=>{
     console.log(err.name , err.message)
     process.exit(1)
+})
+process.on("SIGTERM",()=>{
+    console.log("SIGTERM RECIEVE SHUTTING DOWN!")
+    server.close(()=>{
+      console.log("Process terminated")
+    })
 })

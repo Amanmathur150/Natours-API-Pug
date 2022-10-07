@@ -1,14 +1,16 @@
 const express = require('express');
 const { protect, restrictTo, loggedIn, loggedOut } = require('../controllers/authControllers');
-const { getPaymentSuccess, getPaymentCancel, getPaymentDone, getMyBookings } = require('../controllers/bookingControllers');
+const { getPaymentSuccess, getPaymentCancel, getPaymentDone, getMyBookings, alertMessage } = require('../controllers/bookingControllers');
 const { getOverview, getTours, getLoginForm, getAccount } = require('../controllers/viewControllers');
 
 
 
 const viewRoute = express.Router();
 
+viewRoute.use(alertMessage)
+
 // viewRoute.use(loggedIn)
-viewRoute.get("/",loggedIn,getPaymentDone,getOverview)
+viewRoute.get("/",loggedIn,getOverview)
 viewRoute.get("/payment/success",loggedIn,getPaymentSuccess)
 viewRoute.get("/payment/cancel",loggedIn,getPaymentCancel)
 

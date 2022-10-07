@@ -2,6 +2,7 @@
 const express = require("express")
 var morgan = require('morgan')
 const path = require('path')
+const cors = require('cors')
 const app = express()
 const cookieParser = require('cookie-parser')
 const compression = require('compression')
@@ -12,9 +13,22 @@ const userRoute = require("./routes/userRoutes")
 const reviewRoute = require("./routes/reviewRoutes")
 const viewRoute = require("./routes/viewRoutes")
 const bookingRoute = require("./routes/bookingRoutes")
+const { webhookCheckout } = require("./controllers/bookingControllers")
+
+app.enable("trust proxy")
 
 
 app.set("view engine" , "pug")
+
+app.post('/webhook-payment', express.raw({type: 'application/json'}),webhookCheckout)
+
+
+app.use(cors())
+// app.use(cors({
+//     origin : "Your website name "
+// }))
+app.options("*",cors())
+
 app.use(express.static(path.join(__dirname , "public")) )
 
 // MIDDLEWERE 
